@@ -3,7 +3,7 @@ from Agent import Agent
 import pygame
 import time
 import numpy as np
-
+ 
 env = Environment(screen_dim=[800,800], tile_size=40)
 
 cent, map = env.createMap()
