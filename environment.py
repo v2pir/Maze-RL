@@ -10,7 +10,7 @@ class Environment:
         self.init_state = np.array([20, 20])
 
         pygame.init()
-
+ 
         # Window
         self.SCREEN_WIDTH = screen_dim[0]
         self.SCREEN_HEIGHT = screen_dim[1]
