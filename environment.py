@@ -2,27 +2,30 @@ import numpy as np
 import pygame
 import random
 
-class Environment:
 
+class Environment:
     def __init__(self, screen_dim, tile_size):
         self.elements = ["X", "O"]
         self.directions = ["LEFT", "UP", "RIGHT", "DOWN"]
-        self.init_state = np.array([20,20])
-        # Initialize
+        self.init_state = np.array([20, 20])
+
         pygame.init()
+
         # Window
         self.SCREEN_WIDTH = screen_dim[0]
         self.SCREEN_HEIGHT = screen_dim[1]
         self.SCREEN = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.FONT = pygame.font.SysFont('Futura', 30)
         pygame.display.set_caption('RL Map')
+
         # Colors
         self.GREY = (60, 60, 60)
         self.BG = (0, 0, 0)
         self.GREEN = (100, 255, 10)
         self.BLUE = (70, 130, 255)
-        self.RED = (255, 0, 0) 
+        self.RED = (255, 0, 0)
         self.WHITE = (255, 255, 255)
+
         # Variables
         self.tile_size = tile_size
         self.visted = {}
@@ -30,22 +33,20 @@ class Environment:
 
     def createMap(self):
         centers = []
-        for x in range(int(self.SCREEN_WIDTH/self.tile_size)):
-            for y in range(int(self.SCREEN_HEIGHT/self.tile_size)):
-                centers.append((20 + x*40, 20 + y*40))
+        for x in range(int(self.SCREEN_WIDTH / self.tile_size)):
+            for y in range(int(self.SCREEN_HEIGHT / self.tile_size)):
+                centers.append((20 + x * 40, 20 + y * 40))
 
         map = {centers[i]: "X" for i in range(len(centers))}
 
         pos = self.init_state.copy()
-
         map[tuple(pos)] = "O"
 
         c = centers.copy()
 
         while pos[0] != 780 and pos[1] != 780:
-            
             # Find random direction
-            dir = self.directions[random.randint(0,3)]
+            dir = self.directions[random.randint(0, 3)]
 
             # Move accordingly
             if dir == "DOWN":
@@ -68,20 +69,18 @@ class Environment:
             if map[n] == "O":
                 continue
 
-            # replace the "X" with "O"
+            # Replace the "X" with "O"
             map[n] = "O"
 
-            # remove this coordinate from map so it doesn't get repeated
+            # Remove this coordinate from map so it doesn't get repeated
             c.remove(n)
-        
+
         return centers, map
     
     def reset_run(self):
         return self.init_state
 
-    # FUNCTIONS
     def draw_grid(self, tile_size):
-        # Fill screen
         self.SCREEN.fill(self.BG)
 
         # Draw vertical lines
@@ -92,8 +91,8 @@ class Environment:
         for y in range(tile_size, self.SCREEN_HEIGHT, tile_size):
             pygame.draw.line(self.SCREEN, self.GREY, (0, y), (self.SCREEN_WIDTH, y))
 
-    # Draw map tiles, walls, and open spaces
     def draw_map(self, centers, map):
+        # Draw map tiles, walls, and open spaces
         for coord in centers:
             letter = map[coord]
             if letter == "O":
@@ -101,7 +100,7 @@ class Environment:
             else:
                 color = self.RED
             img = self.FONT.render(letter, True, color)
-            self.SCREEN.blit(img, np.array(coord) - np.array([14,20]))
+            self.SCREEN.blit(img, np.array(coord) - np.array([14, 20]))
 
     def draw_robot(self, location):
         letter = "R"
@@ -120,8 +119,8 @@ class Environment:
         self.draw_grid(self.tile_size)
         self.draw_map(centers, map)
 
-    # Draw rewards for each tile
     def draw_rewards(self, map):
+        # Draw rewards for each tile
         cent = list(map.keys())
         reward_map = {cent[i]: -1 for i in range(len(cent))}
 
@@ -130,13 +129,10 @@ class Environment:
         return reward_map
 
     def step(self, current_pos, action, map):
-
         done = False
         reward = 0
 
-        # Get current location
         location = current_pos.copy()
-
         reward_map = self.draw_rewards(map)
 
         # Move accordingly
@@ -170,7 +166,7 @@ class Environment:
             self.visited[tuple(location)] += 1
             reward -= self.visited[tuple(location)] * 0.5  # Penalize repeat visits
         else:
-            reward += 12 # Reward finding new spots
+            reward += 12  # Reward finding new spots
 
         if self.goal_state is not None:
             distance_to_goal = np.linalg.norm(np.array(location) - np.array(self.goal_state))
