@@ -27,10 +27,10 @@ class Environment:
         self.WHITE = (255, 255, 255)
 
         # Variables
-        self.tile_size = tile_size
-        self.visted = {}
+        self.tile_size = tile_size 
+        self.visted = {} 
         self.goal_state = None
-
+   
     def createMap(self):
         centers = []
         for x in range(int(self.SCREEN_WIDTH / self.tile_size)):
